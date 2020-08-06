@@ -126,8 +126,10 @@ class ReinforceAgent():
         mini_batch = random.sample(self.memory, self.batch_size)
         X_batch = np.empty((0, self.state_size), dtype=np.float64)
         Y_batch = np.empty((0, self.action_size), dtype=np.float64)
-        X_batch_camera = np.empty(((0, 480, 640, 3)), dtype=np.float64)
-
+        #RGB
+        #X_batch_camera = np.empty(((0, 480, 640, 3)), dtype=np.float64)
+        #Gray
+        X_batch_camera = np.empty(((0, 480, 640,1)), dtype=np.float64)
         for i in range(self.batch_size):
             states = mini_batch[i][0]
             actions = mini_batch[i][1]
@@ -169,7 +171,11 @@ if __name__ == '__main__':
     result = Float32MultiArray()
     get_action = Float32MultiArray()
 
-    state_size_2 = (480, 640, 3)
+    #RGB
+    #state_size_2 = (480, 640, 3)
+    
+    #Gray
+    state_size_2 = (480, 640,1)
 
     state_size = 182
     action_size = 5
@@ -184,6 +190,7 @@ if __name__ == '__main__':
     for e in range(agent.load_episode + 1, EPISODES):
         done = False
         state,camera_state = env.reset()
+        
         score = 0
         for t in range(agent.episode_step):
             action = agent.getAction(state,camera_state)

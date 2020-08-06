@@ -46,6 +46,7 @@ class Env():
         self.pause_proxy = rospy.ServiceProxy('gazebo/pause_physics', Empty)
         self.respawn_goal = Respawn()
         self.bridge = CvBridge()
+       
 
     def getGoalDistace(self):
         goal_distance = round(math.hypot(self.goal_x - self.position.x, self.goal_y - self.position.y), 2)
@@ -137,9 +138,10 @@ class Env():
             try:
                 data = rospy.wait_for_message('/hsrb/base_scan', LaserScan, timeout=5)
                 data_camera = rospy.wait_for_message('/hsrb/head_rgbd_sensor/rgb/image_raw', Image, timeout=5)
-                data_camera = self.bridge.imgmsg_to_cv2(data_camera, "bgr8")
-                #data_camera = np.expand_dims(data_camera, axis=0)
-                rospy.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                #data_camera = self.bridge.imgmsg_to_cv2(data_camera, "bgr8")
+                data_camera = self.bridge.imgmsg_to_cv2(data_camera, "mono8")
+                data_camera = data_camera.reshape(480,640, 1)
+                
             except:
                 pass
 
@@ -163,9 +165,9 @@ class Env():
             try:
                 data = rospy.wait_for_message('/hsrb/base_scan', LaserScan, timeout=5)
                 data_camera = rospy.wait_for_message('/hsrb/head_rgbd_sensor/rgb/image_raw', Image, timeout=5)
-                data_camera = self.bridge.imgmsg_to_cv2(data_camera, "bgr8")
-                #data_camera = np.expand_dims(data_camera, axis=0)
-                rospy.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+                #data_camera = self.bridge.imgmsg_to_cv2(data_camera, "bgr8")
+                data_camera = self.bridge.imgmsg_to_cv2(data_camera, "mono8")
+                data_camera = data_camera.reshape(480,640, 1)
 
             except:
                 pass
