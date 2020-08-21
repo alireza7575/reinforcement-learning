@@ -30,7 +30,7 @@ class Window(QtWidgets.QMainWindow):
     def __init__(self):
         super(Window, self).__init__()
 
-        self.workbook = xlsxwriter.Workbook('/home/upm/RL_ws/src/hsr_navigation/result.xlsx')
+        self.workbook = xlsxwriter.Workbook('/home/upm/RL_ws(18-8-2020)/src/hsr_navigation/result.xlsx')
         # Start from the first cell. 
         # Rows and columns are zero indexed. 
         self.row = 0

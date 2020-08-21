@@ -14,8 +14,8 @@ class Respawn():
     def __init__(self):
        
         
-        self.modelPath  = '/home/upm/RL_ws/src/hsr_navigation/model/goal_box/model.sdf'
-        self.humanmodelPath  = '/home/upm/RL_ws/src/hsr_simulation/models/citizen_extras_male_05/model.sdf'
+        self.modelPath  = '/home/upm/RL_ws(18-8-2020)/src/hsr_navigation/model/goal_box/model.sdf'
+        self.humanmodelPath  = '/home/upm/RL_ws(18-8-2020)/src/hsr_simulation/models/citizen_extras_male_05/model.sdf'
         self.f_human = open(self.humanmodelPath, 'r')
         self.f = open(self.modelPath, 'r')
 
@@ -59,13 +59,14 @@ class Respawn():
                 
                 self.check_model = True
 
-    def respawnModel(self):
+    def respawnModel(self, human):
         while True:
             if not self.check_model:
                 rospy.wait_for_service('gazebo/spawn_sdf_model')
                 spawn_model_prox = rospy.ServiceProxy('gazebo/spawn_sdf_model', SpawnModel)
                 spawn_model_prox(self.modelName, self.model, 'robotos_name_space', self.goal_position, "world")
-                spawn_model_prox('human', self.human_model, 'robotos_name_space', self.human_goal_position, "world")
+                if human:
+                    spawn_model_prox('human', self.human_model, 'robotos_name_space', self.human_goal_position, "world")
                 rospy.loginfo("Goal position : %.1f, %.1f", self.goal_position.position.x,
                               self.goal_position.position.y)
                 break
@@ -87,7 +88,7 @@ class Respawn():
             else:
                 pass
 
-    def getPosition(self, position_check=False, delete=False):
+    def getPosition(self, position_check=False, delete=False,human=False):
         if delete:
             self.deleteModel()
 
@@ -137,7 +138,7 @@ class Respawn():
                 self.human_goal_position.position.y = self.goal_position.position.y 
 
         time.sleep(0.5)
-        self.respawnModel()
+        self.respawnModel(human=human)
 
         self.last_goal_x = self.goal_position.position.x
         self.last_goal_y = self.goal_position.position.y

@@ -28,6 +28,7 @@ from std_srvs.srv import Empty
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from respawngole import Respawn
 from cv_bridge import CvBridge
+import cv2 as cv
 
 
 class Env():
@@ -95,7 +96,7 @@ class Env():
 
         return scan_range + [heading, current_distance], done
 
-    def setReward(self, state, done, action):
+    def setReward(self, state, done, action,human):
         yaw_reward = []
         current_distance = state[-1]
         heading = state[-2]
@@ -117,13 +118,13 @@ class Env():
             rospy.loginfo("Goal!!")
             reward = 200
             self.pub_cmd_vel.publish(Twist())
-            self.goal_x, self.goal_y = self.respawn_goal.getPosition(True, delete=True)
+            self.goal_x, self.goal_y = self.respawn_goal.getPosition(True, delete=True, human=human)
             self.goal_distance = self.getGoalDistace()
             self.get_goalbox = False
 
         return reward
 
-    def step(self, action):
+    def step(self, action,human):
         max_angular_vel = 1.5
         ang_vel = ((self.action_size - 1)/2 - action) * max_angular_vel * 0.5
 
@@ -140,19 +141,21 @@ class Env():
                 data_camera = rospy.wait_for_message('/hsrb/head_rgbd_sensor/rgb/image_raw', Image, timeout=5)
                 #data_camera = self.bridge.imgmsg_to_cv2(data_camera, "bgr8")
                 data_camera = self.bridge.imgmsg_to_cv2(data_camera, "mono8")
-                data_camera = data_camera.reshape(480,640, 1)
+                data_camera =cv.resize(data_camera, (400, 300)) 
+                data_camera = data_camera.reshape(300,400, 1)
+                #data_camera.fill(0)
                 
             except:
                 pass
 
         state, done = self.getState(data)
-        reward = self.setReward(state, done, action)
+        reward = self.setReward(state, done, action,human=human)
 
         return np.asarray(state), reward, done,data_camera
         
     
 
-    def reset(self):
+    def reset(self,):
         rospy.wait_for_service('/gazebo/reset_simulation')
         try:
             self.reset_proxy()
@@ -167,7 +170,9 @@ class Env():
                 data_camera = rospy.wait_for_message('/hsrb/head_rgbd_sensor/rgb/image_raw', Image, timeout=5)
                 #data_camera = self.bridge.imgmsg_to_cv2(data_camera, "bgr8")
                 data_camera = self.bridge.imgmsg_to_cv2(data_camera, "mono8")
-                data_camera = data_camera.reshape(480,640, 1)
+                data_camera =cv.resize(data_camera, (400, 300)) 
+                data_camera = data_camera.reshape(300,400, 1)
+                #data_camera.fill(0)
 
             except:
                 pass
